@@ -1,34 +1,68 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
+import { useDispatch } from "react-redux";
+import {
+  editTodo,
+  removeTodo,
+  toggleCompletedTodo,
+} from "../redux/store/todos";
 
-function Todo() {
-  const [isComplatted, setIsComplatted] = useState(false);
-  const handleCheckboxChange = (e) => {
-    setIsComplatted(e.target.checked);
+function Todo({ title, isCompleted, id, index }) {
+  const [isEditable, setIsEditable] = useState(false);
+  const dispatch = useDispatch();
+  const inputRef = useRef();
+
+  const handleRemoveTodo = () => {
+    dispatch(removeTodo(id));
   };
+  const handleCompleted = () => {
+    dispatch(toggleCompletedTodo(id));
+  };
+  const handleUpdate = () => {
+    setIsEditable(!isEditable);
+    dispatch(editTodo({ id: id, title: inputRef.current.value }));
+  };
+
   return (
     <li className="bg-slate-100 rounded-md shadow-sm shadow-teal-500 my-3 p-2">
-      <div className="flex items-center">
-        <input
-          id="todo1"
-          name="todo1"
-          type="checkbox"
-          checked={isComplatted ? true : false}
-          className="h-4 w-4 accent-teal-600 focus:ring-teal-500 border-gray-300 rounded"
-          onChange={(e) => handleCheckboxChange(e)}
-        />
+      <div className="flex items-center justify-between gap-4">
         <div className="ml-3 flex items-center gap-2 text-gray-900">
-          <span
-            className={`text-lg font-medium ${
-              isComplatted ? "line-through" : ""
-            }`}
+          <span>{index}</span>
+          {isEditable ? (
+            <input
+              className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
+              type="text"
+              placeholder="Type New Title"
+              defaultValue={title}
+              ref={inputRef}
+            />
+          ) : (
+            <span
+              className={`text-lg font-medium ${
+                isCompleted ? "line-through" : ""
+              }`}
+            >
+              {title}
+            </span>
+          )}
+        </div>
+        <div className="flex gap-2">
+          <button
+            className="bg-red-400 hover:bg-red-500 text-white font-bold px-2 rounded"
+            onClick={() => handleRemoveTodo()}
           >
-            Finish project proposal
-          </span>
-          <button className="bg-red-600 hover:bg-red-700 text-white font-bold px-2 rounded">
             delete
           </button>
-          <button className="bg-teal-500 hover:bg-teal-600 text-white font-bold px-2 rounded">
-            edit
+          <button
+            className="bg-teal-500 hover:bg-teal-600 text-white font-bold px-2 rounded"
+            onClick={() => handleCompleted()}
+          >
+            {isCompleted ? <>unCompleted</> : <>Completed</>}
+          </button>
+          <button
+            className="bg-purple-400 hover:bg-purple-500 text-white font-bold px-2 rounded"
+            onClick={() => handleUpdate()}
+          >
+            {isEditable ? <>save</> : <>edit</>}
           </button>
         </div>
       </div>

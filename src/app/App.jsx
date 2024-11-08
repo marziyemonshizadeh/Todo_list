@@ -1,7 +1,25 @@
+import { useDispatch, useSelector } from "react-redux";
 import "../App.css";
-import Todo from "../components/todo";
+import TodosList from "../components/todosList";
+import { addTodo } from "../redux/store/todos";
 
 function App() {
+  const todos = useSelector((state) => state.todos);
+  const dispatch = useDispatch();
+
+  const handleKeyEnter = (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      dispatch(
+        addTodo({
+          id: Math.floor(Math.random() * 100),
+          title: e.target.value,
+          isCompleted: false,
+        })
+      );
+      e.target.value = "";
+    }
+  };
   return (
     <div className="h-screen bg-slate-200 flex flex-col justify-center items-center">
       <div className="px-4 py-2">
@@ -15,28 +33,18 @@ function App() {
             <input
               className="appearance-none bg-transparent border-none w-full text-gray-700 mr-3 py-1 px-2 leading-tight focus:outline-none"
               type="text"
-              placeholder="Add a task"
+              placeholder="Type a text & press Enter"
+              onKeyDown={handleKeyEnter}
+              required
             />
-            <button
-              className="flex-shrink-0 bg-teal-500 hover:bg-teal-700 border-teal-500 hover:border-teal-700 text-sm border-4 text-white py-1 px-2 rounded"
-              type="button"
-            >
-              Add
-            </button>
           </div>
         </form>
       </div>
-      <ul className="px-4 max-h-[500px] overflow-y-scroll overflow-hidden scrollbar-thin scrollbar-thumb-teal-500 scrollbar-track-transparent">
-        <Todo />
-        {/* <Todo />
-        <Todo />
-        <Todo />
-        <Todo />
-        <Todo />
-        <Todo />
-        <Todo />
-        <Todo /> */}
-      </ul>
+      {todos?.length > 0 ? (
+        <TodosList />
+      ) : (
+        <div className="my-4">todo is empty please add todo :)</div>
+      )}
     </div>
   );
 }
